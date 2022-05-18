@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+{% block title %}
+    {{ product.title|title }} {{ product.variant }}
+{% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="{% static 'shop/css/product_details.css' %}">
+
+    {#    <h1>{{ product.title }}</h1>#}
+    {#    <img src="{{ product.image.url }}" height="400">#}
+    {#    <p>{{ product.detail }}</p>#}
+    {#    <h3>Colors:</h3>#}
+    {#    {% for color in colors %}#}
+    {#        <p>{{ color.color__name }}</p>#}
+    {#    {% endfor %}#}
+    {##}
+    {#    {% for type in types %}#}
+    {#        <p>{{ type.type__type }}</p>#}
+    {#    {% endfor %}#}
+    {##}
+    {#    {% for variant in variants %}#}
+    {#            <p>{{ variant.color.name }}</p>#}
+    {#            <p>{{ variant.title }}</p>#}
+    {#        <div><h3>{{ variant.images.variants.price }}</h3>#}
+    {#            <p><img src="{{ variant.images.image.url }}" width="120"></p>#}
+    {#        </div>#}
+    {#    {% endfor %}#}
+    {#    {% for image in images %}#}
+    {#        <img src="{{ image.image.url }}" width="120">#}
+    {#    {% endfor %}#}
+    <div class="main-wrapper">
+        <div class="container">
+            <div class="product-div">
+                <div class="product-div-left">
+                    <div class="img-container">
+                        {% if variants.images %}
+                            <img src="{{ variants.first.images.image.url }}" alt="{{ variants.first.title }}"
+                                 id="zoom_image">
+                        {% else %}
+                            <img src="{{ product.image.url }}" alt="{{ product.title }}" id="zoom_image">
+                        {% endif %}
+                    </div>
+                    <div class="hover-container" id="related_images">
+                        {% for related_image in related_images %}
+                            {% if related_image.image %}
+                                <div><img src="{{ related_image.image.url }}"></div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="product-div-right">
+                    <span class="product-name">{{ product.title }} {{ product.brand }}</span>
+                    <span id="old_price" class="product-price"
+                          style="text-decoration: line-through; font-size: small">{{ variants.first.price|floatformat:"0"|intcomma:' ' }}</span>
+                    <span id="new_price"
+                          class="product-price">{{ variants.first.sale_price|floatformat:"0"|intcomma:' ' }}</span>
+                    <span id="sale_percent" style="font-size: medium"><strong>{{ variants.first.sale_percent }}<i>% скидка</i></strong></span>
+                    <br>
+                    <h2 style="display: flex;"><span style="padding-right: 4px;">Цвет: </span> <span
+                            id="color-container"> {{ variants.first.color.name }}</span></h2>
+                    {% if variants.first.type %}
+                        <h2 style="display: flex;"><span style="padding-right: 4px;">Тип двери: </span><span
+                                id="type-container">{{ variants.first.type }}</span></h2>
+                    {% endif %}
+                    <h2>Виды:</h2>
+                    <div class="hover-container" style="justify-content: left; margin-top: 1rem" id="variant_images">
+                        {% for variant in variants %}
+                            {% if variant.images %}
+                                <div data-price="{{ variant.images.variants.price|floatformat:"0"|intcomma:' ' }}"
+                                     data-color="{{ variant.images.variants.color.name }}"
+                                     data-sale_price="{{ variant.images.variants.sale_price|floatformat:"0"|intcomma:' ' }}"
+                                     data-sale_percent="{{ variant.images.variants.sale_percent }}"
+                                     data-type="{{ variant.type }}">
+                                    <img src="{{ variant.images.image.url }}"></div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <p class="product-description">{{ product.description|safe }}</p>
+                    {#                    <div class="btn-groups">#}
+                    {#                        <button type="button" class="add-cart-btn"><i class="fas fa-shopping-cart"></i>add to cart#}
+                    {#                        </button>#}
+                    {#                        <button type="button" class="buy-now-btn"><i class="fas fa-wallet"></i>buy now</button>#}
+                    {#                    </div>#}
+                </div>
+            </div>
+            <h3>Основные Характеристики:</h3>
+            <p>{{ product.detail|safe }}</p>
+            <p>{{ product.detail|safe }}</p>
+        </div>
+    </div>
+
+    <script>
+        const allHoverImages = document.querySelectorAll('#variant_images div img');
+        const allHoverRelatedImages = document.querySelectorAll('#related_images div img');
+        const imgContainer = document.querySelector('.img-container');
+        const old_price = document.querySelector('#old_price');
+        const new_price = document.querySelector('#new_price');
+        const sale_percent = document.querySelector('#sale_percent');
+        const colorContainer = document.querySelector('#color-container');
+        const typeContainer = document.querySelector('#type-container');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            allHoverImages[0].parentElement.classList.add('active');
+        });
+
+        allHoverImages.forEach((image) => {
+            image.addEventListener('click', () => {
+                imgContainer.querySelector('img').src = image.src;
+                old_price.innerHTML = image.parentElement.dataset.price;
+                new_price.innerHTML = image.parentElement.dataset.sale_price;
+                sale_percent.innerHTML = '<strong>' + image.parentElement.dataset.sale_percent + '<i>% скидка</i></strong>'
+                colorContainer.innerHTML = image.parentElement.dataset.color;
+                typeContainer.innerHTML = image.parentElement.dataset.type;
+                resetActiveImg();
+                image.parentElement.classList.add('active');
+            });
+        });
+
+        allHoverRelatedImages.forEach((image) => {
+            image.addEventListener('click', () => {
+                imgContainer.querySelector('img').src = image.src;
+                resetActiveImg();
+                image.parentElement.classList.add('active');
+            });
+        });
+
+        function resetActiveImg() {
+            allHoverImages.forEach((img) => {
+                img.parentElement.classList.remove('active');
+            });
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#zoom_image").imagezoomsl({
+                zoomrange: [3, 3],
+            });
+        });
+    </script>
+
+{% endblock %}

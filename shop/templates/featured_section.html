@@ -1,0 +1,47 @@
+{% load humanize %}
+{% load custom_tags %}
+<!-- featured section starts  -->
+
+<section class="featured" id="featured">
+
+    <h1 class="heading"><span>{{ roomDoors.first.product.category.name }}</span></h1>
+
+    <div class="swiper featured-slider">
+
+        <div class="swiper-wrapper">
+
+            {% for roomDoor in roomDoors %}
+                <div class="swiper-slide box" style="height: 100%;">
+                    {#                    <div class="icons">#}
+                    {#                        <a href="#" class="fas fa-search"></a>#}
+                    {#                        <a href="#" class="fas fa-heart"></a>#}
+                    {#                        <a href="#" class="fas fa-eye"></a>#}
+                    {#                    </div>#}
+                    <div class="image">
+                        <img src="{{ roomDoor.image.url }}" alt="">
+                    </div>
+                    <div class="content">
+                        <h3>{{ roomDoor.product.title }} {{ roomDoor.color.name }}</h3>
+                        <div class="price">
+                            <span class="sale_price">{{ roomDoor.sale_price|floatformat:"0"|intcomma:' ' }}</span>
+                        </div>
+                        <a href="{% url 'product_detail' roomDoor.product.slug %}" class="btn">Подробнее</a>
+                    </div>
+                </div>
+            {% endfor %}
+
+
+        </div>
+
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+
+    </div>
+
+</section>
+
+
+<!-- featured section ends -->
+
+
+
